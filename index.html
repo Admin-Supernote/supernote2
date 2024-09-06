@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compiti Scolastici con Traduzione</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        .day-box {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            min-height: 200px;
+        }
+        .compito {
+            padding: 5px;
+            margin: 5px 0;
+            border-radius: 4px;
+            color: #fff;
+        }
+        .language-selector {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .language-selector span {
+            font-size: 2rem;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+        .admin-actions {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Selettore delle lingue -->
+<div class="language-selector">
+    <span id="lang-it" onclick="setLanguage('it')">🇮🇹</span>
+    <span id="lang-fr" onclick="setLanguage('fr')">🇫🇷</span>
+    <span id="lang-en" onclick="setLanguage('en')">🇬🇧</span>
+</div>
+
+<h2 id="title">Compiti Scolastici</h2>
+
+<!-- Container per i giorni -->
+<div class="container">
+    <div class="day-box" id="monday">
+        <h3 id="monday-title">Lunedì</h3>
+        <div class="compiti"></div>
+        <div class="admin-actions">
+            <input type="text" id="compitoInputMonday" placeholder="Aggiungi compito">
+            <select id="colorMonday">
+                <option value="red">Rosso</option>
+                <option value="green">Verde</option>
+                <option value="blue">Blu</option>
+            </select>
+            <button onclick="addCompito('monday')">Aggiungi</button>
+        </div>
+    </div>
+    <div class="day-box" id="tuesday">
+        <h3 id="tuesday-title">Martedì</h3>
+        <div class="compiti"></div>
+        <div class="admin-actions">
+            <input type="text" id="compitoInputTuesday" placeholder="Aggiungi compito">
+            <select id="colorTuesday">
+                <option value="red">Rosso</option>
+                <option value="green">Verde</option>
+                <option value="blue">Blu</option>
+            </select>
+            <button onclick="addCompito('tuesday')">Aggiungi</button>
+        </div>
+    </div>
+    <div class="day-box" id="wednesday">
+        <h3 id="wednesday-title">Mercoledì</h3>
+        <div class="compiti"></div>
+        <div class="admin-actions">
+            <input type="text" id="compitoInputWednesday" placeholder="Aggiungi compito">
+            <select id="colorWednesday">
+                <option value="red">Rosso</option>
+                <option value="green">Verde</option>
+                <option value="blue">Blu</option>
+            </select>
+            <button onclick="addCompito('wednesday')">Aggiungi</button>
+        </div>
+    </div>
+    <div class="day-box" id="thursday">
+        <h3 id="thursday-title">Giovedì</h3>
+        <div class="compiti"></div>
+        <div class="admin-actions">
+            <input type="text" id="compitoInputThursday" placeholder="Aggiungi compito">
+            <select id="colorThursday">
+                <option value="red">Rosso</option>
+                <option value="green">Verde</option>
+                <option value="blue">Blu</option>
+            </select>
+            <button onclick="addCompito('thursday')">Aggiungi</button>
+        </div>
+    </div>
+    <div class="day-box" id="friday">
+        <h3 id="friday-title">Venerdì</h3>
+        <div class="compiti"></div>
+        <div class="admin-actions">
+            <input type="text" id="compitoInputFriday" placeholder="Aggiungi compito">
+            <select id="colorFriday">
+                <option value="red">Rosso</option>
+                <option value="green">Verde</option>
+                <option value="blue">Blu</option>
+            </select>
+            <button onclick="addCompito('friday')">Aggiungi</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dizionari di traduzione
+    const translations = {
+        it: {
+            title: "Compiti Scolastici",
+            monday: "Lunedì",
+            tuesday: "Martedì",
+            wednesday: "Mercoledì",
+            thursday: "Giovedì",
+            friday: "Venerdì"
+        },
+        fr: {
+            title: "Devoirs Scolaires",
+            monday: "Lundi",
+            tuesday: "Mardi",
+            wednesday: "Mercredi",
+            thursday: "Jeudi",
+            friday: "Vendredi"
+        },
+        en: {
+            title: "School Assignments",
+            monday: "Monday",
+            tuesday: "Tuesday",
+            wednesday: "Wednesday",
+            thursday: "Thursday",
+            friday: "Friday"
+        }
+    };
+
+    let compiti = {
+        monday: [],
+        tuesday: [],
+        wednesday: [],
+        thursday: [],
+        friday: []
+    };
+
+    let currentLanguage = 'it';
+
+    // Funzione per impostare la lingua
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        document.getElementById('title').textContent = translations[lang].title;
+        document.getElementById('monday-title').textContent = translations[lang].monday;
+        document.getElementById('tuesday-title').textContent = translations[lang].tuesday;
+        document.getElementById('wednesday-title').textContent = translations[lang].wednesday;
+        document.getElementById('thursday-title').textContent = translations[lang].thursday;
+        document.getElementById('friday-title').textContent = translations[lang].friday;
+
+        renderCompiti(); // Aggiorna i compiti tradotti
+    }
+
+    // Funzione per aggiungere un compito
+    function addCompito(day) {
+        const compitoInput = document.getElementById(`compitoInput${capitalizeFirstLetter(day)}`).value;
+        const compitoColor = document.getElementById(`color${capitalizeFirstLetter(day)}`).value;
+
+        if (compitoInput) {
+            compiti[day].push({ text: compitoInput, color: compitoColor });
+            renderCompiti();
+            document.getElementById(`compitoInput${capitalizeFirstLetter(day)}`).value = ''; // Resetta il campo di input
+        }
+    }
+
+    // Funzione per visualizzare i compiti
+    function renderCompiti() {
+        for (let day in compiti) {
+            const compitoContainer = document.querySelector(`#${day} .compiti`);
+            compitoContainer.innerHTML = ''; // Pulisce i compiti precedenti
+            compiti[day].forEach(compito => {
+                const compitoElement = document.createElement('div');
+                compitoElement.classList.add('compito');
+                compitoElement.style.backgroundColor = compito.color;
+                compitoElement.textContent = translateCompito(compito.text, currentLanguage);
+                compitoContainer.appendChild(compitoElement);
+            });
+        }
+    }
+
+    // Funzione per tradurre i compiti (simulata, puoi espandere con più traduzioni)
+    function translateCompito(compitoText, lang) {
+        const translations = {
+            it: {
+                "Homework 1": "Compito 1",
+                "Homework 2": "Compito 2"
+            },
+            fr: {
+                "Homework 1": "Devoir 1",
+                "Homework 2": "Devoir 2"
+            },
+           
