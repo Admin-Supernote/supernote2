@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperNote - Compiti</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 36px;
+        }
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .day {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .admin-button {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .admin-button:hover {
+            background-color: #0056b3;
+        }
+        .profile-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .profile-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Compiti della Settimana</h1>
+<div class="days-grid">
+    <div class="day" id="monday">Lunedì</div>
+    <div class="day" id="tuesday">Martedì</div>
+    <div class="day" id="wednesday">Mercoledì</div>
+    <div class="day" id="thursday">Giovedì</div>
+    <div class="day" id="friday">Venerdì</div>
+</div>
+
+<!-- Admin Button for ACESARONI and ABECAGLI -->
+<button id="adminButton" class="admin-button" onclick="goToAdmin()">Admin Dashboard</button>
+
+<!-- Profile Button for all users -->
+<button id="profileButton" class="profile-button" onclick="goToProfile()">Profile Settings</button>
+
+<script>
+    const loggedInUser = sessionStorage.getItem("loggedInUser");
+    const users = {
+        'ACESARONI': { password: 'aB4cD3eF5g', isAdmin: true },
+        'ABECAGLI': { password: 'xY7kL8mQ9p', isAdmin: true },
+        'VBOSIO': { password: 'zW2oK1nH3v', isAdmin: false },
+        'GPOMPEI': { password: 'rN5jM7bT4x', isAdmin: false },
+    };
+
+    if (!loggedInUser) {
+        window.location.href = "login.html"; // Redirect to login page if not logged in
+    } else if (users[loggedInUser].isAdmin) {
+        document.getElementById("adminButton").style.display = "block"; // Show admin button only for admin users
+    }
+
+    function goToAdmin() {
+        window.location.href = "admin_dashboard.html"; // Redirect to admin dashboard
+    }
+
+    function goToProfile() {
+        window.location.href = "profile_settings.html"; // Redirect to profile settings
+    }
+</script>
+
+</body>
+</html>
