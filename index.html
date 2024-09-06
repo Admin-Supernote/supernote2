@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperNote - Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        h1 {
+            text-align: center;
+            font-size: 48px;
+            color: #333;
+        }
+        h2 {
+            text-align: center;
+            color: blue;
+            font-size: 24px;
+        }
+        .login-box {
+            max-width: 400px;
+            margin: 5% auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        #taskSection {
+            display: none;
+            text-align: center;
+        }
+        .error {
+            color: red;
+        }
+        .color-picker {
+            margin-top: 10px;
+        }
+        #sideTab {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 250px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+        }
+        #sideTab a {
+            display: block;
+            color: white;
+            padding: 10px;
+            text-decoration: none;
+        }
+        #sideTab a:hover {
+            background-color: #575757;
+        }
+        .main-content {
+            margin-left: 260px;
+            padding: 20px;
+            display: none;
+        }
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .day {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        /* Admin dashboard styling */
+        .admin-dashboard {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        .toggle-password {
+            cursor: pointer;
+            position: absolute;
+            right: 30px;
+            top: 125px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Login Box -->
+<div id="loginBox" class="login-box">
+    <h1>SuperNote</h1>
+    <h2>Login</h2>
+    <form id="loginForm">
+        <input type="text" id="username" placeholder="Username" required>
+        <div style="position: relative;">
+            <input type="password" id="password" placeholder="Password" required>
+            <span class="toggle-password" onclick="togglePassword()">👁️</span>
+        </div>
+        <input type="submit" value="Login">
+    </form>
+    <input type="color" id="loginBgColor" class="color-picker" value="#f4f4f4" onchange="changeBgColor()"> <!-- Color picker for background -->
+    <p id="loginMessage" class="error"></p>
+</div>
+
+<!-- Sidebar for navigation after login -->
+<div id="sideTab">
+    <h2>Menu</h2>
+    <a href="#" onclick="showDashboard()">Dashboard</a>
+    <a href="#">Impostazioni Profilo</a>
+    <a href="#">Seleziona Lingua</a>
+</div>
+
+<!-- Main content after login -->
+<div class="main-content" id="mainContent">
+    <h2>Compiti della Settimana</h2>
+    <div class="days-grid">
+        <div class="day" id="monday">Lunedì</div>
+        <div class="day" id="tuesday">Martedì</div>
+        <div class="day" id="wednesday">Mercoledì</div>
+        <div class="day" id="thursday">Giovedì</div>
+        <div class="day" id="friday">Venerdì</div>
+    </div>
+    <button onclick="showAdminDashboard()">Vai alla Dashboard Admin</button>
+</div>
+
+<!-- Admin Dashboard (only for admin) -->
+<div id="adminDashboard" class="admin-dashboard">
+    <h2>Admin Dashboard</h2>
+    <label for="subject">Materia:</label>
+    <input type="text" id="subject" placeholder="Inserisci la materia">
+    
+    <label for="taskText">Testo del Compito:</label>
+    <textarea id="taskText" placeholder="Inserisci il testo del compito"></textarea>
+    
+    <label for="taskImage">Carica Immagine (opzionale):</label>
+    <input type="file" id="taskImage">
+    
+    <label for="taskColor">Colore del Compito:</label>
+    <input type="color" id="taskColor" value="#FF0000">
+    
+    <label for="taskDay">Giorno:</label>
+    <select id="taskDay">
+        <option value="monday">Lunedì</option>
+        <option value="tuesday">Martedì</option>
+        <option value="wednesday">Mercoledì</option>
+        <option value="thursday">Giovedì</option>
+        <option value="friday">Venerdì</option>
+    </select>
+    
+    <button onclick="addTask()">Aggiungi Compito</button>
+</div>
+
+<script>
+    const users = {
+        'ACESARONI': { password: 'aB4cD3eF5g', isAdmin: true },
+        'ABECAGLI': { password: 'xY7kL8mQ9p', isAdmin: false },
+        'VBOSIO': { password: 'zW2oK1nH3v', isAdmin: false },
+        'GPOMPEI': { password: 'rN5jM7bT4x', isAdmin: false },
+        // Aggiungi gli altri utenti qui
+    };
+
+    let currentUser = null;
+
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        
+        const username = document.getElementById("username").value.toUpperCase().trim();
+        const password = document.getElementById("password").value.trim();
+        const messageElement = document.getElementById("loginMessage");
+
+        if (users[username] && users[username].password === password) {
+            currentUser = users[username];
+            document.getElementById("loginBox").style.display = "none"; // Nasconde il login box
+            document.getElementById("sideTab").style.display = "block"; // Mostra il side tab
+            document.getElementById("mainContent").style.display = "block"; // Mostra il contenuto principale
+            messageElement.textContent = "";
+
+            if (currentUser.isAdmin) {
+                document.getElementById("adminDashboard").style.display = "block"; // Mostra la dashboard admin se admin
+            }
+        } else {
+            messageElement.textContent = "Username o password errati."; // Mostra errore
+        }
+    });
+
+    function togglePassword() {
+        const passwordField = document.getElementById("password");
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+        } else {
+            passwordField.type = "password";
+        }
+    }
+
+    function changeBgColor() {
+        const newColor = document.getElementById("loginBgColor").value;
+        document.body.style.backgroundColor = newColor;
+    }
+
+    function showDashboard() {
+        document.getElementById("mainContent").style.display = "block";
+        document.getElementById("adminDashboard").style.display = "none";
+    }
+
+    function showAdminDashboard() {
+        document.getElementById("adminDashboard").style.display = "block";
+        document.getElementById("mainContent").style.display = "none";
+    }
+
+    function addTask() {
+        const subject = document.getElementById("subject").value;
+        const taskText = document.getElementById("taskText").value;
+        const taskColor = document.getElementById("taskColor").value;
+        const taskDay = document.getElementById("taskDay").value;
+        const taskImage = document.getElementById("taskImage").files[0];
+
+        const taskList = document.getElementById(taskDay);
+        const newTask = document.createElement("div");
+        newTask.style.color = taskColor;
+        newTask.textContent = `${subject}: ${taskText}`;
+        taskList.appendChild(newTask);
+
+        if (taskImage) {
+            const img = document.createElement("img");
+            img.src = URL.createObjectURL(taskImage);
+            img.style.maxWidth = "100px";
+            taskList.appendChild(img);
+        }
+    }
+</script>
+
+</body>
+</html>
