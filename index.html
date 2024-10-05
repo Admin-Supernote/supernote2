@@ -3,85 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuperNote - Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-        }
-        .login-box {
-            max-width: 400px;
-            margin: 5% auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        input[type="text"], input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        input[type="submit"] {
-            padding: 10px 20px;
-            border: none;
-            background-color: #007BFF;
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-        .error {
-            color: red;
-        }
-    </style>
+    <title>Trova le Differenze</title>
 </head>
 <body>
-
-<div class="login-box">
-    <h1>SuperNote</h1>
-    <h2>Login</h2>
-    <form id="loginForm" onsubmit="login(event)">
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="password" id="password" placeholder="Password" required>
-        <input type="submit" value="Login">
-    </form>
-    <p id="loginMessage" class="error"></p>
-</div>
-
-<script>
-    const users = {
-        'ACESARONI': { password: 'aB4cD3eF5g', isAdmin: true },
-        'ABECAGLI': { password: 'xY7kL8mQ9p', isAdmin: true },
-        'VBOSIO': { password: 'zW2oK1nH3v', isAdmin: false },
-        'GPOMPEI': { password: 'rN5jM7bT4x', isAdmin: false },
-    };
-
-    function login(event) {
-        event.preventDefault();
-        const username = document.getElementById("username").value.toUpperCase().trim();
-        const password = document.getElementById("password").value.trim();
-        const messageElement = document.getElementById("loginMessage");
-
-        if (users[username] && users[username].password === password) {
-            sessionStorage.setItem("loggedInUser", username);
-            window.location.href = "compiti.html"; // Redirect to compiti page after login
-        } else {
-            messageElement.textContent = "Username o password errati.";
-        }
-    }
-
-    if (sessionStorage.getItem("loggedInUser")) {
-        window.location.href = "compiti.html"; // If user is already logged in, redirect to compiti page
-    }
-</script>
-
+    <div id="game"></div>
+    <script src="script.js"></script>
 </body>
 </html>
