@@ -77,6 +77,7 @@ function login(role) {
         document.getElementById('register-login').style.display = 'none';
         document.getElementById('project-dashboard').style.display = 'block';
         document.getElementById('add-task-button').style.display = 'none'; // Nascondi il pulsante di creazione task per co-worker
+        document.getElementById('add-user-button').style.display = 'none'; // Nascondi il pulsante di creazione utente per co-worker
         loadProjectTasks(currentProject);
     }
 }
@@ -135,6 +136,20 @@ function addUser() {
     }
 }
 
+// Funzione per mostrare il modale di creazione task
+function showTaskForm() {
+    document.getElementById('task-name').value = ''; // Reset dei campi
+    document.getElementById('task-user').value = '';
+    document.getElementById('task-desc').value = '';
+    document.getElementById('task-color').value = '#000000';
+    document.getElementById('task-modal').style.display = 'block';
+}
+
+// Funzione per nascondere il modale di creazione task
+function hideTaskForm() {
+    document.getElementById('task-modal').style.display = 'none';
+}
+
 // Funzione per creare un nuovo task
 function createTask() {
     if (!currentProject) {
@@ -142,20 +157,21 @@ function createTask() {
         return;
     }
 
-    const taskName = prompt('Inserisci il nome del task:');
-    if (!taskName) return;
+    const taskName = document.getElementById('task-name').value;
+    const assignedUser = document.getElementById('task-user').value;
+    const taskDesc = document.getElementById('task-desc').value;
+    const taskColor = document.getElementById('task-color').value;
 
-    const assignedUser = prompt('Assegna il task a un co-worker (inserisci username):');
     const userExists = currentProject.users.find(user => user.username === assignedUser);
     if (!userExists) {
         alert(`Utente ${assignedUser} non esiste in questo progetto!`);
         return;
     }
 
-    const taskColor = prompt('Inserisci un colore per il task (es: #ff0000):');
     const task = {
         name: taskName,
         assignedUser: assignedUser,
+        description: taskDesc,
         color: taskColor,
         status: 'to-do'
     };
@@ -163,13 +179,14 @@ function createTask() {
     currentProject.tasks.push(task);
     localStorage.setItem('projects', JSON.stringify(projects)); // Aggiorna il progetto nel localStorage
     loadProjectTasks(currentProject);
+    hideTaskForm(); // Nascondi il modale dopo la creazione del task
     alert('Task creato con successo!');
 }
 
 // Funzione per generare un ID univoco mescolando numeri e lettere del nome del progetto
 function generateProjectId(projectName) {
     let id = '';
-    const characters = '0123456789';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     const nameArray = projectName.split(''); // Divide il nome del progetto in lettere
     for (let i = 0; i < nameArray.length; i++) {
         const randomNum = characters.charAt(Math.floor(Math.random() * characters.length)); // Numero casuale
@@ -234,6 +251,21 @@ function drop(event) {
     loadProjectTasks(currentProject);
 }
 
+// Funzione per eliminare un task tramite drag-and-drop nel cestino
+function deleteTask(event) {
+    event.preventDefault();
+    const data = event.dataTransfer.getData("text");
+    const taskElement = document.getElementById(data);
+    if (taskElement) {
+        const taskName = taskElement.innerText.split(" -> ")[0];
+        const taskIndex = currentProject.tasks.findIndex(task => task.name === taskName);
+        currentProject.tasks.splice(taskIndex, 1);
+        localStorage.setItem('projects', JSON.stringify(projects)); // Aggiorna il progetto nel localStorage
+        loadProjectTasks(currentProject);
+        alert(`Task ${taskName} eliminato con successo!`);
+    }
+}
+
 // Funzione per caricare i task del progetto corrente
 function loadProjectTasks(project) {
     // Svuota le colonne prima di caricare i task
@@ -248,7 +280,7 @@ function loadProjectTasks(project) {
         taskElement.id = 'task-' + index;
         taskElement.draggable = true;
         taskElement.ondragstart = drag;
-        taskElement.innerText = `${task.name} -> ${task.assignedUser}`;
+        taskElement.innerText = `${task.name} -> ${task.assignedUser}\nDescrizione: ${task.description}`;
         taskElement.style.borderLeftColor = task.color;
 
         if (task.status === 'to-do') {
