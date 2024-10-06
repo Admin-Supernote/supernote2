@@ -128,6 +128,37 @@ function generateProjectId(projectName) {
     return id;
 }
 
+// Funzione per creare un nuovo task
+function createTask() {
+    if (!currentProject) {
+        alert('Nessun progetto selezionato. Crea o carica un progetto.');
+        return;
+    }
+
+    const taskName = prompt('Inserisci il nome del task:');
+    if (!taskName) return;
+
+    const assignedUser = prompt('Assegna il task a un co-worker (inserisci username):');
+    const userExists = currentProject.users.find(user => user.username === assignedUser);
+    if (!userExists) {
+        alert(`Utente ${assignedUser} non esiste in questo progetto!`);
+        return;
+    }
+
+    const taskColor = prompt('Inserisci un colore per il task (es: #ff0000):');
+    const task = {
+        name: taskName,
+        assignedUser: assignedUser,
+        color: taskColor,
+        status: 'to-do'
+    };
+
+    currentProject.tasks.push(task);
+    localStorage.setItem('projects', JSON.stringify(projects));
+    loadProjectTasks(currentProject);
+    alert('Task creato con successo!');
+}
+
 // Funzione per visualizzare i progetti dell'utente loggato
 function viewProjects() {
     const projectList = document.getElementById('project-list');
@@ -142,6 +173,11 @@ function viewProjects() {
             projectList.appendChild(projectDiv);
         }
     });
+
+    const createTaskButton = document.createElement('button');
+    createTaskButton.innerText = 'Crea Task';
+    createTaskButton.onclick = createTask;
+    projectList.appendChild(createTaskButton);
 }
 
 // Funzione per caricare un progetto specifico e visualizzare i task
@@ -149,6 +185,8 @@ function loadProject(projectId) {
     const project = projects.find(proj => proj.projectId === projectId);
     if (!project) return;
 
+    currentProject = project;
+    localStorage.setItem('currentProject', JSON.stringify(currentProject));
     document.getElementById('project-management').style.display = 'none';
     document.getElementById('project-dashboard').style.display = 'block';
     document.getElementById('project-name').innerText = project.projectName;
