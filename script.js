@@ -1,15 +1,18 @@
-// Variabili globali
+// Variabili globali per la gestione dei dati
 let users = JSON.parse(localStorage.getItem('users')) || [];
 let projects = JSON.parse(localStorage.getItem('projects')) || [];
 let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser')) || null;
+let currentProject = JSON.parse(localStorage.getItem('currentProject')) || null;
 
 // Funzione per alternare tra i form di registrazione e login
-function toggleForms() {
-    document.getElementById('register-form').style.display = document.getElementById('register-form').style.display === 'none' ? 'block' : 'none';
-    document.getElementById('login-form').style.display = document.getElementById('login-form').style.display === 'none' ? 'block' : 'none';
+function toggleForms(formId) {
+    document.getElementById('register-form').style.display = 'none';
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('coworker-login-form').style.display = 'none';
+    document.getElementById(formId).style.display = 'block';
 }
 
-// Funzione per registrare un nuovo utente
+// Funzione per registrare un nuovo creatore di progetti
 function register() {
     const email = document.getElementById('reg-email').value;
     const username = document.getElementById('reg-username').value;
@@ -25,34 +28,59 @@ function register() {
         return;
     }
 
-    users.push({ email, username, password, projects: [] });
+    users.push({ email, username, password, role: 'creator', projects: [] });
     localStorage.setItem('users', JSON.stringify(users));
     alert('Registrazione avvenuta con successo!');
-    toggleForms();
+    toggleForms('login-form');
 }
 
-// Funzione per effettuare il login
-function login() {
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
+// Funzione per effettuare il login per creatori di progetto e co-worker
+function login(role) {
+    let username, password, projectId;
+    if (role === 'creator') {
+        const email = document.getElementById('login-email').value;
+        password = document.getElementById('login-password').value;
+        const user = users.find(user => user.email === email && user.password === password && user.role === 'creator');
 
-    const user = users.find(user => user.email === email && user.password === password);
+        if (!user) {
+            alert('Email o password non validi per il creatore di progetto!');
+            return;
+        }
 
-    if (!user) {
-        alert('Email o password non validi!');
-        return;
+        loggedInUser = user;
+        localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+        alert('Login effettuato con successo come creatore di progetto!');
+        document.getElementById('register-login').style.display = 'none';
+        document.getElementById('project-management').style.display = 'block';
+    } else {
+        username = document.getElementById('coworker-username').value;
+        password = document.getElementById('coworker-password').value;
+        projectId = document.getElementById('project-id').value;
+
+        const project = projects.find(proj => proj.projectId === projectId);
+        if (!project) {
+            alert('ID progetto non valido!');
+            return;
+        }
+
+        const user = project.users.find(user => user.username === username && user.password === password);
+        if (!user) {
+            alert('Username o password non validi per co-worker!');
+            return;
+        }
+
+        currentProject = project;
+        localStorage.setItem('currentProject', JSON.stringify(currentProject));
+        alert('Login effettuato con successo come co-worker!');
+        document.getElementById('register-login').style.display = 'none';
+        document.getElementById('project-dashboard').style.display = 'block';
+        loadProjectTasks(currentProject);
     }
-
-    loggedInUser = user;
-    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-    alert('Login effettuato con successo!');
-    document.getElementById('register-login').style.display = 'none';
-    document.getElementById('project-management').style.display = 'block';
 }
 
 // Funzione per creare un nuovo progetto
 function createProject() {
-    const projectName = prompt('Inserisci il nome del progetto:');
+    const projectName = prompt('Inserisci il nome del progetto (solo lettere):');
     if (!projectName || !/^[A-Za-z]+$/.test(projectName)) {
         alert('Il nome del progetto deve contenere solo lettere!');
         return;
@@ -101,7 +129,7 @@ function viewProjects() {
     });
 }
 
-// Funzione per caricare un progetto specifico
+// Funzione per caricare un progetto specifico e visualizzare i task
 function loadProject(projectId) {
     const project = projects.find(proj => proj.projectId === projectId);
     if (!project) return;
@@ -109,15 +137,79 @@ function loadProject(projectId) {
     document.getElementById('project-management').style.display = 'none';
     document.getElementById('project-dashboard').style.display = 'block';
     document.getElementById('project-name').innerText = project.projectName;
+    loadProjectTasks(project);
 }
 
-// Funzione di esempio per le impostazioni
-function settings() {
-    alert('Impostazioni utente in fase di sviluppo.');
+// Funzione per caricare i task del progetto corrente
+function loadProjectTasks(project) {
+    // Svuota le colonne prima di caricare i task
+    document.getElementById('to-do').innerHTML = '<h3>To Do</h3>';
+    document.getElementById('in-progress').innerHTML = '<h3>In Progress</h3>';
+    document.getElementById('done').innerHTML = '<h3>Done</h3>';
+
+    // Itera attraverso i task del progetto e li posiziona nella colonna corretta
+    project.tasks.forEach(task => {
+        const taskElement = document.createElement('div');
+        taskElement.className = 'task';
+        taskElement.innerText = `${task.name} -> ${task.assignedUser}`;
+        taskElement.style.borderLeftColor = task.color;
+
+        taskElement.setAttribute('draggable', true);
+        taskElement.ondragstart = (e) => dragStart(e, taskElement);
+
+        if (task.status === 'to-do') {
+            document.getElementById('to-do').appendChild(taskElement);
+        } else if (task.status === 'in-progress') {
+            document.getElementById('in-progress').appendChild(taskElement);
+        } else if (task.status === 'done') {
+            document.getElementById('done').appendChild(taskElement);
+        }
+    });
 }
 
-// Salvataggio automatico dell'utente loggato
+// Funzioni di supporto per drag and drop
+function dragStart(e, taskElement) {
+    e.dataTransfer.setData('text/plain', taskElement.innerText);
+    e.dataTransfer.effectAllowed = 'move';
+}
+
+// Eventi per le colonne
+document.querySelectorAll('.column').forEach(column => {
+    column.ondragover = (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    };
+
+    column.ondrop = (e) => {
+        e.preventDefault();
+        const data = e.dataTransfer.getData('text/plain');
+        const taskElement = document.createElement('div');
+        taskElement.className = 'task';
+        taskElement.innerText = data;
+        column.appendChild(taskElement);
+
+        // Aggiorna lo stato del task e salva su localStorage
+        updateTaskStatus(data.split(' -> ')[0], column.id);
+    };
+});
+
+// Funzione per aggiornare lo stato del task
+function updateTaskStatus(taskName, newStatus) {
+    const projectIndex = projects.findIndex(proj => proj.projectId === currentProject.projectId);
+    const taskIndex = projects[projectIndex].tasks.findIndex(task => task.name === taskName);
+
+    projects[projectIndex].tasks[taskIndex].status = newStatus;
+    localStorage.setItem('projects', JSON.stringify(projects));
+}
+
+// Salvataggio automatico dell'utente loggato e del progetto corrente
 if (loggedInUser) {
     document.getElementById('register-login').style.display = 'none';
     document.getElementById('project-management').style.display = 'block';
+}
+
+if (currentProject) {
+    document.getElementById('register-login').style.display = 'none';
+    document.getElementById('project-dashboard').style.display = 'block';
+    loadProjectTasks(currentProject);
 }
