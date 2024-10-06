@@ -21,6 +21,12 @@ function generateUUID() {
     });
 }
 
+// Funzione per salvare gli utenti e i progetti nel localStorage
+function saveToLocalStorage() {
+    localStorage.setItem('users', JSON.stringify(users));
+    localStorage.setItem('projects', JSON.stringify(projects));
+}
+
 // Funzione per registrare un nuovo creatore di progetti
 function register() {
     const email = document.getElementById('reg-email').value;
@@ -28,17 +34,21 @@ function register() {
     const password = document.getElementById('reg-password').value;
     const confirmPassword = document.getElementById('reg-confirm-password').value;
 
+    // Controlla se le password corrispondono
     if (password !== confirmPassword) {
         alert('Le password non corrispondono!');
         return;
     }
+
+    // Controlla se l'email o l'username esistono già
     if (users.find(user => user.email.toLowerCase() === email.toLowerCase() || user.username.toLowerCase() === username.toLowerCase())) {
         alert('Esiste già un utente con questa email o username!');
         return;
     }
 
+    // Aggiunge il nuovo utente al database
     users.push({ email, username, password, role: 'creator', projects: [] });
-    localStorage.setItem('users', JSON.stringify(users));
+    saveToLocalStorage();
     alert('Registrazione avvenuta con successo!');
     toggleForms('login-form');
 }
@@ -119,9 +129,9 @@ function createProject() {
     }
 
     projects.push(project);
-    localStorage.setItem('projects', JSON.stringify(projects));
+    saveToLocalStorage();
     loggedInUser.projects.push(projectId);
-    localStorage.setItem('users', JSON.stringify(users)); // Aggiorna l'utente nel localStorage
+    saveToLocalStorage(); // Aggiorna l'utente nel localStorage
     alert(`Progetto creato con successo! ID del progetto: ${projectId}`);
 }
 
@@ -136,7 +146,7 @@ function addUser() {
     const password = prompt(`Inserisci la password per l'utente ${username}:`);
     if (username && password) {
         currentProject.users.push({ username: username.toLowerCase(), password });
-        localStorage.setItem('projects', JSON.stringify(projects)); // Aggiorna il progetto nel localStorage
+        saveToLocalStorage(); // Aggiorna il progetto nel localStorage
         alert(`Utente ${username} aggiunto con successo!`);
     }
 }
@@ -182,7 +192,7 @@ function createTask() {
     };
 
     currentProject.tasks.push(task);
-    localStorage.setItem('projects', JSON.stringify(projects)); // Aggiorna il progetto nel localStorage
+    saveToLocalStorage(); // Aggiorna il progetto nel localStorage
     loadProjectTasks(currentProject);
     hideTaskForm(); // Nascondi il modale dopo la creazione del task
     alert('Task creato con successo!');
@@ -240,7 +250,7 @@ function drop(event) {
     const task = currentProject.tasks.find(task => task.name === taskName);
     task.status = newStatus;
 
-    localStorage.setItem('projects', JSON.stringify(projects)); // Salva le modifiche al progetto nel localStorage
+    saveToLocalStorage(); // Salva le modifiche al progetto nel localStorage
     loadProjectTasks(currentProject);
 }
 
@@ -253,7 +263,7 @@ function deleteTask(event) {
         const taskName = taskElement.innerText.split(" -> ")[0];
         const taskIndex = currentProject.tasks.findIndex(task => task.name === taskName);
         currentProject.tasks.splice(taskIndex, 1);
-        localStorage.setItem('projects', JSON.stringify(projects)); // Aggiorna il progetto nel localStorage
+        saveToLocalStorage(); // Aggiorna il progetto nel localStorage
         loadProjectTasks(currentProject);
         alert(`Task ${taskName} eliminato con successo!`);
     }
