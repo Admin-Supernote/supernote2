@@ -102,10 +102,9 @@
             border-left: 5px solid #007bff;
         }
 
-        #add-task-button {
+        #add-task-button, #add-user-button {
             position: fixed;
             bottom: 20px;
-            right: 20px;
             font-size: 24px;
             background: #007bff;
             color: white;
@@ -117,8 +116,16 @@
             display: none; /* Inizia come nascosto */
         }
 
-        #add-task-button:hover {
+        #add-task-button:hover, #add-user-button:hover {
             background: #0056b3;
+        }
+
+        #add-task-button {
+            right: 20px;
+        }
+
+        #add-user-button {
+            left: 20px;
         }
     </style>
 </head>
@@ -182,20 +189,21 @@
         <div id="project-dashboard" style="display: none;">
             <h2 id="project-name"></h2>
             <div class="task-board">
-                <div class="column" id="to-do">
+                <div class="column" id="to-do" ondrop="drop(event)" ondragover="allowDrop(event)">
                     <h3>To Do</h3>
                 </div>
-                <div class="column" id="in-progress">
+                <div class="column" id="in-progress" ondrop="drop(event)" ondragover="allowDrop(event)">
                     <h3>In Progress</h3>
                 </div>
-                <div class="column" id="done">
+                <div class="column" id="done" ondrop="drop(event)" ondragover="allowDrop(event)">
                     <h3>Done</h3>
                 </div>
             </div>
         </div>
 
-        <!-- Pulsante per Aggiungere Nuovi Task -->
+        <!-- Pulsanti per Aggiungere Nuovi Task e Co-worker -->
         <button id="add-task-button" onclick="createTask()">+</button>
+        <button id="add-user-button" onclick="addUser()">👤</button>
 
     </div>
     <script src="script.js"></script>
