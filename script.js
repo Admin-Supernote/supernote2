@@ -74,6 +74,7 @@ function login(role) {
         alert('Login effettuato con successo come co-worker!');
         document.getElementById('register-login').style.display = 'none';
         document.getElementById('project-dashboard').style.display = 'block';
+        document.getElementById('add-task-button').style.display = 'none'; // Nascondi il pulsante di creazione task
         loadProjectTasks(currentProject);
     }
 }
@@ -173,11 +174,6 @@ function viewProjects() {
             projectList.appendChild(projectDiv);
         }
     });
-
-    const createTaskButton = document.createElement('button');
-    createTaskButton.innerText = 'Crea Task';
-    createTaskButton.onclick = createTask;
-    projectList.appendChild(createTaskButton);
 }
 
 // Funzione per caricare un progetto specifico e visualizzare i task
@@ -190,6 +186,7 @@ function loadProject(projectId) {
     document.getElementById('project-management').style.display = 'none';
     document.getElementById('project-dashboard').style.display = 'block';
     document.getElementById('project-name').innerText = project.projectName;
+    document.getElementById('add-task-button').style.display = loggedInUser.role === 'creator' ? 'block' : 'none'; // Mostra il pulsante se il creatore è loggato
     loadProjectTasks(project);
 }
 
