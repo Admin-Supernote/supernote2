@@ -78,7 +78,7 @@ function login(role) {
     }
 }
 
-// Funzione per creare un nuovo progetto
+// Funzione per creare un nuovo progetto e aggiungere co-worker
 function createProject() {
     const projectName = prompt('Inserisci il nome del progetto (solo lettere):');
     if (!projectName || !/^[A-Za-z]+$/.test(projectName)) {
@@ -93,6 +93,21 @@ function createProject() {
         tasks: [],
         users: []
     };
+
+    // Aggiungi utenti al progetto
+    let addMoreUsers = true;
+    while (addMoreUsers) {
+        const username = prompt('Inserisci il nome utente del co-worker (lascia vuoto per terminare):');
+        if (!username) break;
+
+        const password = prompt(`Inserisci la password per l'utente ${username}:`);
+        if (password) {
+            project.users.push({ username, password });
+            alert(`Utente ${username} aggiunto al progetto con successo!`);
+        }
+
+        addMoreUsers = confirm('Vuoi aggiungere un altro utente?');
+    }
 
     projects.push(project);
     localStorage.setItem('projects', JSON.stringify(projects));
@@ -154,9 +169,6 @@ function loadProjectTasks(project) {
         taskElement.innerText = `${task.name} -> ${task.assignedUser}`;
         taskElement.style.borderLeftColor = task.color;
 
-        taskElement.setAttribute('draggable', true);
-        taskElement.ondragstart = (e) => dragStart(e, taskElement);
-
         if (task.status === 'to-do') {
             document.getElementById('to-do').appendChild(taskElement);
         } else if (task.status === 'in-progress') {
@@ -165,41 +177,6 @@ function loadProjectTasks(project) {
             document.getElementById('done').appendChild(taskElement);
         }
     });
-}
-
-// Funzioni di supporto per drag and drop
-function dragStart(e, taskElement) {
-    e.dataTransfer.setData('text/plain', taskElement.innerText);
-    e.dataTransfer.effectAllowed = 'move';
-}
-
-// Eventi per le colonne
-document.querySelectorAll('.column').forEach(column => {
-    column.ondragover = (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-    };
-
-    column.ondrop = (e) => {
-        e.preventDefault();
-        const data = e.dataTransfer.getData('text/plain');
-        const taskElement = document.createElement('div');
-        taskElement.className = 'task';
-        taskElement.innerText = data;
-        column.appendChild(taskElement);
-
-        // Aggiorna lo stato del task e salva su localStorage
-        updateTaskStatus(data.split(' -> ')[0], column.id);
-    };
-});
-
-// Funzione per aggiornare lo stato del task
-function updateTaskStatus(taskName, newStatus) {
-    const projectIndex = projects.findIndex(proj => proj.projectId === currentProject.projectId);
-    const taskIndex = projects[projectIndex].tasks.findIndex(task => task.name === taskName);
-
-    projects[projectIndex].tasks[taskIndex].status = newStatus;
-    localStorage.setItem('projects', JSON.stringify(projects));
 }
 
 // Salvataggio automatico dell'utente loggato e del progetto corrente
