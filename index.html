@@ -113,7 +113,6 @@
             border: none;
             border-radius: 50%;
             cursor: pointer;
-            display: none; /* Inizia come nascosto */
         }
 
         #add-task-button:hover, #add-user-button:hover, #trash-can-button:hover {
@@ -133,7 +132,6 @@
         }
 
         #trash-can {
-            display: none; /* Nascondi il cestino finché non è attivato */
             position: fixed;
             bottom: 100px;
             left: 50%;
@@ -149,6 +147,7 @@
             font-size: 30px;
             color: white;
             text-align: center;
+            display: none; /* Nascondi il cestino */
         }
 
         #trash-can.active {
