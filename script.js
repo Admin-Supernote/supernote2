@@ -8,6 +8,15 @@ let currentProject = null;
 sessionStorage.removeItem('loggedInUser');
 sessionStorage.removeItem('currentProject');
 
+// Funzione per generare un ID univoco (UUID)
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (Math.random() * 16) | 0,
+            v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+}
+
 // Funzione per alternare tra i form di registrazione e login
 function toggleForms(formId) {
     document.getElementById('register-form').style.display = 'none';
@@ -27,7 +36,7 @@ function register() {
         alert('Le password non corrispondono!');
         return;
     }
-    if (users.find(user => user.email === email || user.username === username)) {
+    if (users.find(user => user.email.toLowerCase() === email.toLowerCase() || user.username.toLowerCase() === username.toLowerCase())) {
         alert('Esiste già un utente con questa email o username!');
         return;
     }
@@ -44,7 +53,7 @@ function login(role) {
     if (role === 'creator') {
         const email = document.getElementById('login-email').value;
         password = document.getElementById('login-password').value;
-        const user = users.find(user => user.email === email && user.password === password && user.role === 'creator');
+        const user = users.find(user => user.email.toLowerCase() === email.toLowerCase() && user.password === password && user.role === 'creator');
 
         if (!user) {
             alert('Email o password non validi per il creatore di progetto!');
@@ -56,17 +65,17 @@ function login(role) {
         document.getElementById('register-login').style.display = 'none';
         document.getElementById('project-management').style.display = 'block';
     } else {
-        username = document.getElementById('coworker-username').value;
+        username = document.getElementById('coworker-username').value.toLowerCase();
         password = document.getElementById('coworker-password').value;
-        projectId = document.getElementById('project-id').value;
+        projectId = document.getElementById('project-id').value.trim();
 
         const project = projects.find(proj => proj.projectId === projectId);
         if (!project) {
-            alert('ID progetto non valido!');
+            alert('ID progetto non valido! Assicurati di avere l\'ID corretto.');
             return;
         }
 
-        const user = project.users.find(user => user.username === username && user.password === password);
+        const user = project.users.find(user => user.username.toLowerCase() === username && user.password === password);
         if (!user) {
             alert('Username o password non validi per co-worker!');
             return;
@@ -89,7 +98,7 @@ function createProject() {
         alert('Il nome del progetto deve contenere solo lettere!');
         return;
     }
-    const projectId = generateProjectId(projectName);
+    const projectId = generateUUID(); // Genera un UUID come ID del progetto
 
     const project = {
         projectName,
@@ -106,7 +115,7 @@ function createProject() {
 
         const password = prompt(`Inserisci la password per l'utente ${username}:`);
         if (password) {
-            project.users.push({ username, password });
+            project.users.push({ username: username.toLowerCase(), password });
             alert(`Utente ${username} aggiunto al progetto con successo!`);
         }
 
@@ -130,7 +139,7 @@ function addUser() {
     const username = prompt('Inserisci il nome utente del co-worker:');
     const password = prompt(`Inserisci la password per l'utente ${username}:`);
     if (username && password) {
-        currentProject.users.push({ username, password });
+        currentProject.users.push({ username: username.toLowerCase(), password });
         localStorage.setItem('projects', JSON.stringify(projects)); // Aggiorna il progetto nel localStorage
         alert(`Utente ${username} aggiunto con successo!`);
     }
@@ -158,7 +167,7 @@ function createTask() {
     }
 
     const taskName = document.getElementById('task-name').value;
-    const assignedUser = document.getElementById('task-user').value;
+    const assignedUser = document.getElementById('task-user').value.toLowerCase();
     const taskDesc = document.getElementById('task-desc').value;
     const taskColor = document.getElementById('task-color').value;
 
@@ -181,18 +190,6 @@ function createTask() {
     loadProjectTasks(currentProject);
     hideTaskForm(); // Nascondi il modale dopo la creazione del task
     alert('Task creato con successo!');
-}
-
-// Funzione per generare un ID univoco mescolando numeri e lettere del nome del progetto
-function generateProjectId(projectName) {
-    let id = '';
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    const nameArray = projectName.split(''); // Divide il nome del progetto in lettere
-    for (let i = 0; i < nameArray.length; i++) {
-        const randomNum = characters.charAt(Math.floor(Math.random() * characters.length)); // Numero casuale
-        id += randomNum + nameArray[i]; // Combina numero e lettera
-    }
-    return id;
 }
 
 // Funzione per visualizzare i progetti dell'utente loggato
