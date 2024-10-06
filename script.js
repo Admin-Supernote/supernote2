@@ -1,12 +1,16 @@
 // Variabili globali per la gestione dei dati
 let users = JSON.parse(localStorage.getItem('users')) || [];
 let projects = JSON.parse(localStorage.getItem('projects')) || [];
-let loggedInUser = null;
-let currentProject = null;
+let loggedInUser = JSON.parse(sessionStorage.getItem('loggedInUser')) || null;
+let currentProject = JSON.parse(sessionStorage.getItem('currentProject')) || null;
 
-// Reset della sessione utente all'avvio della pagina
-sessionStorage.removeItem('loggedInUser');
-sessionStorage.removeItem('currentProject');
+// Funzione per alternare tra i form di registrazione e login
+function toggleForms(formId) {
+    document.getElementById('register-form').style.display = 'none';
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('coworker-login-form').style.display = 'none';
+    document.getElementById(formId).style.display = 'block';
+}
 
 // Funzione per generare un ID univoco (UUID)
 function generateUUID() {
@@ -15,14 +19,6 @@ function generateUUID() {
             v = c === 'x' ? r : (r & 0x3) | 0x8;
         return v.toString(16);
     });
-}
-
-// Funzione per alternare tra i form di registrazione e login
-function toggleForms(formId) {
-    document.getElementById('register-form').style.display = 'none';
-    document.getElementById('login-form').style.display = 'none';
-    document.getElementById('coworker-login-form').style.display = 'none';
-    document.getElementById(formId).style.display = 'block';
 }
 
 // Funzione per registrare un nuovo creatore di progetti
@@ -288,6 +284,12 @@ function loadProjectTasks(project) {
             document.getElementById('done').appendChild(taskElement);
         }
     });
+}
+
+// Funzione per attivare/disattivare il cestino
+function toggleTrashCan() {
+    const trashCan = document.getElementById('trash-can');
+    trashCan.classList.toggle('active');
 }
 
 // Salvataggio automatico dell'utente loggato e del progetto corrente
