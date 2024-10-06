@@ -38,7 +38,7 @@
             margin-bottom: 5px;
         }
 
-        .form-group input {
+        .form-group input, .form-group textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
@@ -127,6 +127,35 @@
         #add-user-button {
             left: 20px;
         }
+
+        #trash-can {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: #ff4d4d;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 30px;
+            color: white;
+            text-align: center;
+        }
+
+        #trash-can:hover {
+            background: #cc0000;
+        }
+
+        #color-picker {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            display: none; /* Inizia nascosto */
+        }
     </style>
 </head>
 <body>
@@ -202,10 +231,33 @@
         </div>
 
         <!-- Pulsanti per Aggiungere Nuovi Task e Co-worker -->
-        <button id="add-task-button" onclick="createTask()">+</button>
+        <button id="add-task-button" onclick="showTaskForm()">+</button>
         <button id="add-user-button" onclick="addUser()">👤</button>
-
+        
+        <!-- Cestino per Eliminare Task -->
+        <div id="trash-can" ondrop="deleteTask(event)" ondragover="allowDrop(event)">🗑</div>
+        
+        <!-- Color Picker -->
+        <input type="color" id="color-picker">
     </div>
+
+    <!-- Modale per la creazione di task -->
+    <div id="task-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Nuovo Task</h2>
+            <label for="task-name">Nome Task</label>
+            <input type="text" id="task-name">
+            <label for="task-user">Assegna Task a (username)</label>
+            <input type="text" id="task-user">
+            <label for="task-desc">Descrizione</label>
+            <textarea id="task-desc"></textarea>
+            <label for="color-picker">Scegli Colore</label>
+            <input type="color" id="task-color">
+            <button onclick="createTask()">Crea Task</button>
+            <button onclick="hideTaskForm()">Annulla</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
