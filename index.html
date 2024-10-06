@@ -3,10 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trova le Differenze</title>
+    <title>Condivisione Testo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .link {
+            margin-top: 20px;
+            word-break: break-word;
+            background: #f1f1f1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+    </style>
 </head>
 <body>
-    <div id="game"></div>
-    <script src="script.js"></script>
+    <div class="container">
+        <h1>Condividi un Testo</h1>
+        <input type="text" id="text-input" placeholder="Inserisci il testo da condividere">
+        <button onclick="generateLink()">Condividi</button>
+        <div id="link-container"></div>
+    </div>
+
+    <script>
+        // Funzione per generare il link di condivisione
+        function generateLink() {
+            const text = document.getElementById('text-input').value;
+            if (text.trim() === '') {
+                alert('Per favore, inserisci un testo prima di condividere.');
+                return;
+            }
+            
+            // Crea un URL con parametro del testo
+            const encodedText = encodeURIComponent(text);
+            const link = `${window.location.href.split('?')[0]}?message=${encodedText}`;
+
+            // Mostra il link nella pagina
+            const linkContainer = document.getElementById('link-container');
+            linkContainer.innerHTML = `
+                <div class="link">
+                    <strong>Link di Condivisione:</strong> <br>
+                    <a href="${link}" target="_blank">${link}</a>
+                </div>
+            `;
+        }
+
+        // Funzione per mostrare il messaggio dalla condivisione, se esiste
+        function showSharedMessage() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('message')) {
+                const message = decodeURIComponent(params.get('message'));
+                alert(`Messaggio Condiviso: ${message}`);
+            }
+        }
+
+        // Mostra il messaggio condiviso se presente nell'URL
+        window.onload = showSharedMessage;
+    </script>
 </body>
 </html>
